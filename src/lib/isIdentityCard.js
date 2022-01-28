@@ -2,6 +2,203 @@ import assertString from './util/assertString';
 import isInt from './isInt';
 
 const validators = {
+  IDN: (str) => {
+    assertString(str);
+
+    const numbers = str.replace(/\D/g, '').split('').map(n => parseInt(n, 10));
+
+    if (numbers.length !== 16) {
+      return false;
+    }
+
+    const numBarier = {
+      11: [
+        [1, 18, null, [
+          [1, 18], [1, 16], [1, 24], [1, 21, [4, 5, 6, 9, 14, 15, 16]], [1, 12], [1, 23],
+          [3, 31, [10, 20, 23, 26, 28, 30]], [1, 27], [1, 10], [1, 16, [3, 5, 6, 7, 8]],
+          [1, 17], [1, 9], [1, 11], [1, 9], [1, 10], [1, 12], [1, 10], [1, 8],
+        ]],
+        [1, 5, null, [[1, 9], [1, 2], [1, 4], [1, 5], [1, 5]]],
+      ],
+      12: [
+        [1, 25, null, [
+          [1, 20], [1, 15],
+          [1, 32, [8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 23, 24, 25, 26, 27, 28]],
+        ]],
+        [1, 8, null, [[1, 21], [1, 8], [1, 4], [1, 6], [1, 5], [1, 5], [1, 6], [1, 6]]],
+      ],
+      13: [
+        [],
+        [],
+      ],
+      14: [
+        [],
+        [],
+      ],
+      15: [
+        [],
+        [],
+      ],
+      16: [
+        [],
+        [],
+      ],
+      17: [
+        [],
+        [],
+      ],
+      18: [
+        [],
+        [],
+      ],
+      19: [
+        [],
+        [],
+      ],
+      21: [
+        [1, 5, null, [[4, 15, [5, 11]], [1, 12], [4, 22, [12, 13, 14, 17]], [1, 13], [1, 9]]],
+        [1, 2, null, [[1, 12], [1, 4]]],
+      ],
+      31: [
+        [],
+        [],
+      ],
+      32: [
+        [],
+        [],
+      ],
+      33: [
+        [],
+        [],
+      ],
+      34: [
+        [],
+        [],
+      ],
+      35: [
+        [],
+        [],
+      ],
+      36: [
+        [],
+        [],
+      ],
+      51: [
+        [],
+        [],
+      ],
+      52: [
+        [],
+        [],
+      ],
+      53: [
+        [],
+        [],
+      ],
+      61: [
+        [],
+        [],
+      ],
+      62: [
+        [],
+        [],
+      ],
+      63: [
+        [],
+        [],
+      ],
+      64: [
+        [],
+        [],
+      ],
+      65: [
+        [],
+        [],
+      ],
+      71: [
+        [],
+        [],
+      ],
+      72: [
+        [],
+        [],
+      ],
+      73: [
+        [],
+        [],
+      ],
+      74: [
+        [],
+        [],
+      ],
+      75: [
+        [],
+        [],
+      ],
+      76: [
+        [],
+        [],
+      ],
+      81: [
+        [],
+        [],
+      ],
+      82: [
+        [],
+        [],
+      ],
+      91: [
+        [],
+        [],
+      ],
+      92: [
+        [],
+        [],
+      ],
+    };
+
+    const proviceCode = parseInt(`${numbers[0]}${numbers[1]}`, 10);
+    const numBariers = numBarier[proviceCode];
+    if (!numBariers) {
+      return false;
+    }
+
+    const regionCode = parseInt(`${numbers[2]}${numbers[3]}`, 10);
+
+    let isCity = 0;
+    let normalRegionCode = regionCode;
+
+    if (regionCode > 70) {
+      isCity = 1;
+      normalRegionCode = regionCode - 70;
+    }
+
+    const [minRegCode, maxRegCode, excldReg, distBarier] = numBariers[isCity];
+
+    let isValidRegion = minRegCode <= normalRegionCode && normalRegionCode <= maxRegCode;
+    if (Array.isArray(excldReg)) {
+      isValidRegion = !excldReg.includes(regionCode);
+    }
+
+    if (!isValidRegion) {
+      return false;
+    }
+
+    const [minDistCode, maxDistCode, excldDist] = distBarier[isCity];
+
+    const distCode = parseInt(`${numbers[4]}${numbers[5]}`, 10);
+
+    let isValidDist = minDistCode <= distCode && distCode <= maxDistCode;
+    if (Array.isArray(excldDist)) {
+      isValidDist = !excldReg.includes(distCode);
+    }
+
+    if (!isValidDist) {
+      return false;
+    }
+
+    return true;
+  },
   PL: (str) => {
     assertString(str);
 
